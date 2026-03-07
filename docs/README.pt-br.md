@@ -1,25 +1,25 @@
-# Application Architecture — AWS Study Project
+# Arquitetura da Aplicação - AWS Study Project
 
-[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](./docs/README.pt-br.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](../README.md)
 
-## 1. Project Objective
+## 1. Objetivo do Projeto
 
-This project aims to build a complete **fullstack application** for learning AWS using modern technologies from the JavaScript ecosystem.
+Este projeto tem como objetivo criar uma aplicação fullstack completa para estudo da AWS utilizando tecnologias modernas do ecossistema JavaScript.
 
-The application will allow learning about:
+A aplicação permitirá aprender:
 
-- Deploying applications on AWS
-- Integration with a SQL database (RDS)
-- Integration with a NoSQL database (DynamoDB)
-- Automated CI/CD
-- Structuring scalable applications
-- Modern fullstack architecture
+- Deploy de aplicações na AWS
+- Integração com banco SQL (RDS)
+- Integração com banco NoSQL (DynamoDB)
+- CI/CD automatizado
+- Estruturação de aplicações escaláveis
+- Arquitetura moderna fullstack
 
-The application will be a **Task Manager**.
+A aplicação será um **Gerenciador de Tarefas (Task Manager)**.
 
 ---
 
-# 2. Technology Stack
+# 2. Stack Tecnológica
 
 ## Backend
 
@@ -35,18 +35,18 @@ The application will be a **Task Manager**.
 ## Frontend
 
 - Next.js (App Router)
-- TailwindCSS — rose palette
+- TailwindCSS - paleta rose
 - shadcn/ui
 - Lucide Icons
 - TanStack Query
 
-## AWS Infrastructure
+## Infraestrutura AWS
 
 - AWS RDS (PostgreSQL)
 - AWS DynamoDB
 - AWS S3
 - AWS CloudFront
-- AWS EC2 or ECS
+- AWS EC2 ou ECS
 - AWS CloudWatch
 - AWS IAM
 
@@ -57,57 +57,57 @@ The application will be a **Task Manager**.
 
 ---
 
-# 3. Application Description
+# 3. Descrição da Aplicação
 
-The application will be a **Task Manager** where users can:
+A aplicação será um **Task Manager** onde usuários podem:
 
-- Create an account
-- Log in
-- Create tasks
-- List tasks
-- Update tasks
-- Delete tasks
-- Mark tasks as completed
+- Criar conta
+- Fazer login
+- Criar tarefas
+- Listar tarefas
+- Atualizar tarefas
+- Excluir tarefas
+- Marcar tarefas como concluídas
 
-Each task belongs to an authenticated user.
+Cada tarefa pertence a um usuário autenticado.
 
 ---
 
-# 4. High-Level Architecture
+# 4. Arquitetura de Alto Nível
 
-Application flow:
+Fluxo da aplicação:
 
 ```
-User
+Usuário
   |
   v
 Next.js Frontend
   |
   v
-NestJS API
+API NestJS
   |
   +----> RDS (PostgreSQL)
   |
   +----> DynamoDB
 ```
 
-Frontend static files will be hosted on:
+Arquivos estáticos do frontend serão hospedados em:
 
 ```
 S3 + CloudFront
 ```
 
-The backend will run on:
+Backend rodará em:
 
 ```
-EC2 or ECS
+EC2 ou ECS
 ```
 
 ---
 
-# 5. Repository Organization
+# 5. Organização do Repositório
 
-Recommended structure:
+Estrutura recomendada:
 
 ```
 task-manager-aws
@@ -120,7 +120,7 @@ docs/
 
 ---
 
-# 6. Backend Structure (NestJS)
+# 6. Estrutura do Backend (NestJS)
 
 ```
 backend/src
@@ -159,9 +159,9 @@ backend/src
 
 ---
 
-# 7. Frontend Structure (Next.js)
+# 7. Estrutura do Frontend (Next.js)
 
-Using **App Router**.
+Utilizando **App Router**.
 
 ```
 frontend/src
@@ -186,7 +186,6 @@ components/
 ├── task
 │   ├── task-card.tsx
 │   ├── task-form.tsx
-│   │
 │   └── task-list.tsx
 │
 └── layout
@@ -207,7 +206,7 @@ hooks/
 
 # 8. Design System
 
-The interface will be built using:
+Interface construída com:
 
 - TailwindCSS
 - shadcn/ui
@@ -215,20 +214,20 @@ The interface will be built using:
 
 ---
 
-# 9. State Management
+# 9. Gerenciamento de Estado
 
-The project will use:
+Será utilizado:
 
 **TanStack Query**
 
-Responsible for:
+Responsável por:
 
-- request caching
-- backend synchronization
-- automatic refetch
+- cache de requisições
+- sincronização com backend
+- refetch automático
 - loading states
 
-Example usage:
+Exemplo de uso:
 
 ```
 useQuery({
@@ -239,13 +238,13 @@ useQuery({
 
 ---
 
-# 10. Data Model
+# 10. Modelo de Dados
 
-## SQL Database — PostgreSQL (RDS)
+## Banco SQL - PostgreSQL (RDS)
 
-Table: `users`
+Tabela: `users`
 
-Fields:
+Campos:
 
 ```
 id UUID
@@ -255,7 +254,7 @@ password_hash TEXT
 created_at TIMESTAMP
 ```
 
-Example Prisma schema:
+Prisma schema exemplo:
 
 ```
 model User {
@@ -269,9 +268,9 @@ model User {
 
 ---
 
-## NoSQL Database — DynamoDB
+## Banco NoSQL - DynamoDB
 
-Table: `tasks`
+Tabela: `tasks`
 
 Partition Key:
 
@@ -285,7 +284,7 @@ Sort Key:
 task_id
 ```
 
-Fields:
+Campos:
 
 ```
 task_id
@@ -296,7 +295,7 @@ status
 created_at
 ```
 
-Possible status values:
+Status possíveis:
 
 ```
 pending
@@ -305,28 +304,28 @@ completed
 
 ---
 
-# 11. Authentication Flow
+# 11. Fluxo de Autenticação
 
-Registration:
+Registro:
 
-1. User submits data
-2. Backend validates the data
-3. Password is encrypted using bcrypt
-4. User is saved in RDS
+1. Usuário envia dados
+2. Backend valida
+3. Senha é criptografada com bcrypt
+4. Usuário salvo no RDS
 
 Login:
 
-1. Backend validates credentials
-2. JWT is generated
-3. Token is returned to the frontend
+1. Backend valida credenciais
+2. JWT é gerado
+3. Token retornado ao frontend
 
-Protected requests use:
+Requisições protegidas utilizam:
 
 ```
 Authorization: Bearer TOKEN
 ```
 
-NestJS uses:
+NestJS utiliza:
 
 ```
 AuthGuard
@@ -334,31 +333,31 @@ AuthGuard
 
 ---
 
-# 12. Task Flow
+# 12. Fluxo de Tarefas
 
-Create task:
+Criar tarefa:
 
 ```
 POST /tasks
 ```
 
-The backend saves the task in DynamoDB.
+Backend salva tarefa no DynamoDB.
 
-List tasks:
+Listar tarefas:
 
 ```
 GET /tasks
 ```
 
-Query by `user_id`.
+Consulta pelo `user_id`.
 
-Update task:
+Atualizar tarefa:
 
 ```
 PATCH /tasks/:id
 ```
 
-Delete task:
+Excluir tarefa:
 
 ```
 DELETE /tasks/:id
@@ -366,30 +365,30 @@ DELETE /tasks/:id
 
 ---
 
-# 13. Deployment
+# 13. Deploy
 
 Frontend:
 
 ```
 Next build
-→ upload to S3
-→ distribution via CloudFront
+→ upload para S3
+→ distribuição via CloudFront
 ```
 
 Backend:
 
 ```
 Docker container
-→ deploy to EC2 or ECS
+→ deploy em EC2 ou ECS
 ```
 
 ---
 
 # 14. CI/CD
 
-Pipeline using **GitHub Actions**.
+Pipeline via **GitHub Actions**.
 
-Flow:
+Fluxo:
 
 ```
 git push
@@ -421,57 +420,57 @@ invalidate CloudFront
 
 ---
 
-# 15. Monitoring
+# 15. Monitoramento
 
-Logs are sent to:
+Logs enviados para:
 
 ```
 AWS CloudWatch
 ```
 
-This allows:
+Permite:
 
-- monitoring errors
-- tracking execution
-- viewing container logs
+- monitorar erros
+- acompanhar execução
+- visualizar logs de containers
 
 ---
 
-# 16. Security
+# 16. Segurança
 
-Best practices applied:
+Boas práticas aplicadas:
 
-- bcrypt for passwords
+- bcrypt para senhas
 - JWT authentication
-- variables stored in secrets
+- variáveis em secrets
 - HTTPS via CloudFront
-- IAM with least-privilege permissions
+- IAM com permissões mínimas
 
 ---
 
-# 17. Learning Objectives
+# 17. Objetivos de Aprendizado
 
-With this project it will be possible to learn:
+Com este projeto será possível aprender:
 
-### Frontend
+Frontend
 
 - Next.js
 - TanStack Query
 - shadcn
 - Tailwind
 
-### Backend
+Backend
 
 - NestJS
 - Prisma
 - JWT
-- Modular architecture
+- Arquitetura modular
 
-### AWS
+AWS
 
 - S3
 - CloudFront
-- EC2 or ECS
+- EC2 ou ECS
 - RDS
 - DynamoDB
 - CloudWatch
