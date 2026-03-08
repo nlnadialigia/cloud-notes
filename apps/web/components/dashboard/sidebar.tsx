@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n-context'
 import { useNotes } from '@/lib/notes-context'
 import type { NoteFilter } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { Archive, Cloud, FileText, LogOut, Menu, Plus, Settings, X } from 'lucide-react'
+import { Archive, Cloud, FileText, LogOut, Menu, Plus, Settings, User, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -86,11 +86,17 @@ export function Sidebar({ onNewNote }: SidebarProps) {
             <p className="text-xs text-muted-foreground">{t('activeAccount')}</p>
           </div>
         </div>
-        <div className="flex justify-between gap-2">
-          <Button variant="ghost" size="sm" className="flex-1">
-            <Link href="/settings" className="flex-1 flex items-center gap-2">
-              <Settings className="h-4 w-4 mr-2" />
-              <p>{t('settings')}</p>
+        <div className="flex gap-2">
+          <Button variant="ghost" size="sm" className="flex-1" asChild>
+            <Link href="/profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Perfil
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex-1" asChild>
+            <Link href="/settings" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              {t('settings')}
             </Link>
           </Button>
           <Button variant="ghost" size="icon" onClick={logout} className="text-muted-foreground hover:text-destructive">

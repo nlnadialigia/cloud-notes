@@ -1,8 +1,17 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import type { Note, CreateNoteInput, UpdateNoteInput, NoteFilter } from './types'
 import { useAuth } from './auth-context'
+import {
+  useNotesQuery,
+  useCreateNoteMutation,
+  useUpdateNoteMutation,
+  useDeleteNoteMutation,
+  useArchiveNoteMutation,
+  useUnarchiveNoteMutation,
+} from '@/hooks/use-notes-query'
+import { toast } from 'sonner'
 
 interface NotesContextType {
   notes: Note[]
@@ -16,47 +25,21 @@ interface NotesContextType {
   unarchiveNote: (id: string) => Promise<void>
   getNoteById: (id: string) => Note | undefined
   filteredNotes: Note[]
+  refreshNotes: () => Promise<void>
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined)
 
-// Mock de notas - será substituído por API real
-const generateMockNotes = (userId: string): Note[] => [
-  {
-    id: 'note_1',
-    userId,
-    title: 'Bem-vindo ao CloudNotes',
-    content:
-      'Esta é sua primeira nota! Use o CloudNotes para organizar suas ideias, tarefas e lembretes. Experimente criar, editar e arquivar suas notas.',
-    createdAt: new Date(Date.now() - 86400000 * 2),
-    updatedAt: new Date(Date.now() - 86400000 * 2),
-    archived: false,
-  },
-  {
-    id: 'note_2',
-    userId,
-    title: 'Lista de Compras',
-    content: '- Leite\n- Pão\n- Ovos\n- Frutas\n- Café',
-    createdAt: new Date(Date.now() - 86400000),
-    updatedAt: new Date(Date.now() - 86400000),
-    archived: false,
-  },
-  {
-    id: 'note_3',
-    userId,
-    title: 'Ideias de Projeto',
-    content: '1. App de receitas\n2. Tracker de hábitos\n3. Calculadora de investimentos',
-    createdAt: new Date(Date.now() - 43200000),
-    updatedAt: new Date(Date.now() - 43200000),
-    archived: true,
-  },
-]
-
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
-  const [notes, setNotes] = useState<Note[]>(() => (user ? generateMockNotes(user.id) : []))
-  const [isLoading, setIsLoading] = useState(false)
+  const { isAuthenticated } = useAuth()
   const [filter, setFilter] = useState<NoteFilter>('all')
+
+  const { data: notes = [], isLoading, refetch } = useNotesQuery()
+  const createMutation = useCreateNoteMutation()
+  const updateMutation = useUpdateNoteMutation()
+  const deleteMutation = useDeleteNoteMutation()
+  const archiveMutation = useArchiveNoteMutation()
+  const unarchiveMutation = useUnarchiveNoteMutation()
 
   const filteredNotes = notes
     .filter((note) => {
@@ -66,96 +49,65 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-  const createNote = useCallback(
-    async (input: CreateNoteInput): Promise<Note> => {
-      if (!user) throw new Error('Usuário não autenticado')
+  const createNote = async (input: CreateNoteInput): Promise<Note> => {
+    try {
+      const note = await createMutation.mutateAsync(input)
+      toast.success('Nota criada com sucesso!')
+      return note
+    } catch (error) {
+      toast.error('Erro ao criar nota')
+      throw error
+    }
+  }
 
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 500))
+  const updateNote = async (id: string, input: UpdateNoteInput): Promise<Note> => {
+    try {
+      const note = await updateMutation.mutateAsync({ id, input })
+      toast.success('Nota atualizada com sucesso!')
+      return note
+    } catch (error) {
+      toast.error('Erro ao atualizar nota')
+      throw error
+    }
+  }
 
-      const now = new Date()
-      const newNote: Note = {
-        id: `note_${Date.now()}`,
-        userId: user.id,
-        title: input.title,
-        content: input.content || '',
-        createdAt: now,
-        updatedAt: now,
-        archived: false,
-      }
+  const deleteNote = async (id: string): Promise<void> => {
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success('Nota deletada com sucesso!')
+    } catch (error) {
+      toast.error('Erro ao deletar nota')
+      throw error
+    }
+  }
 
-      setNotes((prev) => [newNote, ...prev])
-      setIsLoading(false)
+  const archiveNote = async (id: string): Promise<void> => {
+    try {
+      await archiveMutation.mutateAsync(id)
+      toast.success('Nota arquivada com sucesso!')
+    } catch (error) {
+      toast.error('Erro ao arquivar nota')
+      throw error
+    }
+  }
 
-      return newNote
-    },
-    [user],
-  )
+  const unarchiveNote = async (id: string): Promise<void> => {
+    try {
+      await unarchiveMutation.mutateAsync(id)
+      toast.success('Nota desarquivada com sucesso!')
+    } catch (error) {
+      toast.error('Erro ao desarquivar nota')
+      throw error
+    }
+  }
 
-  const updateNote = useCallback(
-    async (id: string, input: UpdateNoteInput): Promise<Note> => {
-      if (!user) throw new Error('Usuário não autenticado')
+  const getNoteById = (id: string): Note | undefined => {
+    return notes.find((note) => note.id === id)
+  }
 
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      let updatedNote: Note | undefined
-
-      setNotes((prev) =>
-        prev.map((note) => {
-          if (note.id === id && note.userId === user.id) {
-            updatedNote = {
-              ...note,
-              ...input,
-              updatedAt: new Date(),
-            }
-            return updatedNote
-          }
-          return note
-        }),
-      )
-
-      setIsLoading(false)
-
-      if (!updatedNote) throw new Error('Nota não encontrada')
-      return updatedNote
-    },
-    [user],
-  )
-
-  const deleteNote = useCallback(
-    async (id: string): Promise<void> => {
-      if (!user) throw new Error('Usuário não autenticado')
-
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      setNotes((prev) => prev.filter((note) => !(note.id === id && note.userId === user.id)))
-      setIsLoading(false)
-    },
-    [user],
-  )
-
-  const archiveNote = useCallback(
-    async (id: string): Promise<void> => {
-      await updateNote(id, { archived: true })
-    },
-    [updateNote],
-  )
-
-  const unarchiveNote = useCallback(
-    async (id: string): Promise<void> => {
-      await updateNote(id, { archived: false })
-    },
-    [updateNote],
-  )
-
-  const getNoteById = useCallback(
-    (id: string): Note | undefined => {
-      return notes.find((note) => note.id === id && note.userId === user?.id)
-    },
-    [notes, user],
-  )
+  const refreshNotes = async () => {
+    await refetch()
+  }
 
   return (
     <NotesContext.Provider
@@ -171,6 +123,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         unarchiveNote,
         getNoteById,
         filteredNotes,
+        refreshNotes,
       }}
     >
       {children}

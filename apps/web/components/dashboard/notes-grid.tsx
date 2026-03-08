@@ -4,6 +4,7 @@ import { FileText, Search } from 'lucide-react'
 import { NoteCard } from './note-card'
 import { Input } from '@/components/ui/input'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import { NoteGridSkeleton } from '@/components/ui/note-skeleton'
 import { useNotes } from '@/lib/notes-context'
 import { useI18n } from '@/lib/i18n-context'
 import type { Note } from '@/lib/types'
@@ -15,7 +16,7 @@ interface NotesGridProps {
 }
 
 export function NotesGrid({ onEdit, onDelete }: NotesGridProps) {
-  const { filteredNotes, archiveNote, unarchiveNote, filter } = useNotes()
+  const { filteredNotes, archiveNote, unarchiveNote, filter, isLoading } = useNotes()
   const { t } = useI18n()
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -56,7 +57,9 @@ export function NotesGrid({ onEdit, onDelete }: NotesGridProps) {
           </div>
         </div>
 
-        {searchedNotes.length === 0 ? (
+        {isLoading ? (
+          <NoteGridSkeleton />
+        ) : searchedNotes.length === 0 ? (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">

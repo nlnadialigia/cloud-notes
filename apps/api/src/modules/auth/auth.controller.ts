@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
 import { UsersService } from '../users/users.service'
@@ -19,7 +19,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Register with AWS Cognito' })
   async register(@Body() dto: RegisterDto) {
     const result = await this.cognitoService.signUp(dto.name, dto.email, dto.password)
-    return { success: true, message: 'User registered successfully', data: result }
+    
+    if (!result.UserSub) throw new Error('User registration failed')
+    
+    // Criar usuário no banco
+    const user = await this.usersService.findOrCreateUser(result.UserSub, dto.email, dto.name)
+    
+    return { 
+      success: true, 
+      message: 'User registered successfully', 
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          createdAt: user.createdAt,
+        },
+      },
+    }
   }
 
   @Post('login')
@@ -34,13 +51,52 @@ export class AuthController {
     const payload = JSON.parse(Buffer.from(idToken.split('.')[1], 'base64').toString())
 
     // Sincronizar usuário no banco
-    await this.usersService.findOrCreateUser(payload.sub, payload.email, payload.name)
+    const user = await this.usersService.findOrCreateUser(payload.sub, payload.email, payload.name)
 
     return {
       success: true,
       data: {
         accessToken: idToken,
         refreshToken: result.AuthenticationResult?.RefreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          createdAt: user.createdAt,
+        },
+      },
+    }
+  }
+
+  @Get('callback')
+  @ApiOperation({ summary: 'OAuth callback handler' })
+  async callback(@Query('code') code: string) {
+    if (!code) {
+      throw new Error('No authorization code provided')
+    }
+
+    const tokens = await this.cognitoService.exchangeCodeForTokens(code)
+    
+    // Extrair dados do token
+    const idToken = tokens.id_token
+    if (!idToken) throw new Error('No ID token received')
+
+    const payload = JSON.parse(Buffer.from(idToken.split('.')[1], 'base64').toString())
+
+    // Sincronizar usuário no banco
+    const user = await this.usersService.findOrCreateUser(payload.sub, payload.email, payload.name)
+
+    return {
+      success: true,
+      data: {
+        accessToken: idToken,
+        refreshToken: tokens.refresh_token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          createdAt: user.createdAt,
+        },
       },
     }
   }

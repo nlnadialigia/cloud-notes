@@ -44,4 +44,30 @@ export class CognitoService {
 
     return this.client.send(command)
   }
+
+  async exchangeCodeForTokens(code: string) {
+    const domain = process.env.AWS_COGNITO_DOMAIN
+    const redirectUri = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback`
+    
+    const params = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: this.clientId,
+      code,
+      redirect_uri: redirectUri,
+    })
+
+    const response = await fetch(`https://${domain}/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to exchange code for tokens')
+    }
+
+    return response.json()
+  }
 }
