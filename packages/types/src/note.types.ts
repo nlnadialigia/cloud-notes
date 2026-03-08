@@ -1,4 +1,5 @@
 export type NoteStatus = 'active' | 'archived';
+export type NoteFilter = 'all' | 'active' | 'archived';
 
 export interface Note {
   noteId: string;

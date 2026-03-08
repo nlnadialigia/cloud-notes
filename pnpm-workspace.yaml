@@ -7,6 +7,7 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - '@scarf/scarf'
   - argon2
+  - es5-ext
   - msw
   - prisma
   - sharp

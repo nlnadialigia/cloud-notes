@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/lib/auth-context'
+import { Cloud, Eye, EyeOff, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Cloud, Eye, EyeOff, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldLabel, FieldGroup } from '@/components/ui/field'
-import { useAuth } from '@/lib/auth-context'
+import { useState } from 'react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,7 +35,7 @@ export default function LoginPage() {
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID
     const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI
     const identityProvider = provider === 'google' ? 'Google' : 'GitHub'
-    
+
     const url = `https://${domain}/oauth2/authorize?identity_provider=${identityProvider}&redirect_uri=${redirectUri}&response_type=code&client_id=${clientId}&scope=email openid profile`
     window.location.href = url
   }
@@ -98,7 +98,7 @@ export default function LoginPage() {
               </FieldGroup>
             </CardContent>
 
-            <CardFooter className="flex flex-col gap-4">
+            <CardFooter className="flex flex-col gap-4 pt-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <>

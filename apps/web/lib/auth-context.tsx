@@ -80,22 +80,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('As senhas não coincidem')
       }
 
-      const response = await authService.register({
+      await authService.register({
         name: credentials.email.split('@')[0],
         email: credentials.email,
         password: credentials.password,
       })
 
-      localStorage.setItem('token', response.accessToken)
-      localStorage.setItem('refreshToken', response.refreshToken)
-      setCookie('token', response.accessToken, 7)
-      setCookie('refreshToken', response.refreshToken, 7)
-
-      setAuthState({
-        user: response.user,
-        isLoading: false,
-        isAuthenticated: true,
-      })
+      // Não faz login automático - usuário precisa confirmar email primeiro
+      setAuthState((prev) => ({ ...prev, isLoading: false }))
     } catch (error) {
       setAuthState((prev) => ({ ...prev, isLoading: false }))
       throw error

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
@@ -11,11 +12,11 @@ export class CognitoService {
   private client: CognitoIdentityProviderClient
   private clientId: string
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.client = new CognitoIdentityProviderClient({
-      region: process.env.AWS_COGNITO_REGION || 'us-east-1',
+      region: this.configService.get('AWS_COGNITO_REGION', 'us-east-1'),
     })
-    this.clientId = process.env.AWS_COGNITO_CLIENT_ID || ''
+    this.clientId = this.configService.get('AWS_COGNITO_CLIENT_ID', '')
   }
 
   async signUp(name: string, email: string, password: string) {
@@ -46,8 +47,8 @@ export class CognitoService {
   }
 
   async exchangeCodeForTokens(code: string) {
-    const domain = process.env.AWS_COGNITO_DOMAIN
-    const redirectUri = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback`
+    const domain = this.configService.get('AWS_COGNITO_DOMAIN')
+    const redirectUri = `${this.configService.get('FRONTEND_URL', 'http://localhost:3000')}/auth/callback`
     
     const params = new URLSearchParams({
       grant_type: 'authorization_code',

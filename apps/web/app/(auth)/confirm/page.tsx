@@ -14,8 +14,9 @@ function ConfirmForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const emailFromUrl = searchParams.get('email') || ''
+  const passwordFromUrl = searchParams.get('password') || ''
 
-  const { confirmSignUp, resendConfirmationCode, isLoading } = useAuth()
+  const { confirmSignUp, resendConfirmationCode, login, isLoading } = useAuth()
   const [email, setEmail] = useState(emailFromUrl)
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
@@ -27,7 +28,14 @@ function ConfirmForm() {
 
     try {
       await confirmSignUp({ email, code })
-      router.push('/login?confirmed=true')
+      
+      // Se temos a senha, faz login automático
+      if (passwordFromUrl) {
+        await login({ email, password: passwordFromUrl })
+        router.push('/dashboard')
+      } else {
+        router.push('/login?confirmed=true')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao confirmar email')
     }
@@ -60,7 +68,8 @@ function ConfirmForm() {
             </div>
             <CardTitle className="text-xl text-card-foreground">Confirme seu email</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Enviamos um código de 6 dígitos para seu email. Digite-o abaixo para confirmar sua conta.
+              Enviamos um código de 6 dígitos para <strong className="text-foreground">{email}</strong>. 
+              Verifique sua caixa de entrada e spam.
             </CardDescription>
           </CardHeader>
 
@@ -132,7 +141,7 @@ function ConfirmForm() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Use o código 123456 para teste (ambiente de desenvolvimento)
+          <strong>Desenvolvimento:</strong> Use o comando <code className="bg-muted px-2 py-1 rounded">pnpm --filter api cognito:confirm {email}</code> para confirmar sem código
         </p>
       </div>
     </div>

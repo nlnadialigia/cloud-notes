@@ -14,42 +14,48 @@ interface UpdateNoteData {
 export const notesService = {
   async getNotes(status?: 'active' | 'archived'): Promise<Note[]> {
     const query = status ? `?status=${status}` : '';
-    return apiClient<Note[]>(`/notes${query}`);
+    const response = await apiClient<{ data: Note[] }>(`/notes${query}`);
+    return response.data;
   },
 
   async getNote(id: string): Promise<Note> {
-    return apiClient<Note>(`/notes/${id}`);
+    const response = await apiClient<{ data: Note }>(`/notes/${id}`);
+    return response.data;
   },
 
   async createNote(data: CreateNoteData): Promise<Note> {
-    return apiClient<Note>('/notes', {
+    const response = await apiClient<{ data: Note }>('/notes', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return response.data;
   },
 
   async updateNote(id: string, data: UpdateNoteData): Promise<Note> {
-    return apiClient<Note>(`/notes/${id}`, {
+    const response = await apiClient<{ data: Note }>(`/notes/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
+    return response.data;
   },
 
   async deleteNote(id: string): Promise<void> {
-    return apiClient<void>(`/notes/${id}`, {
+    await apiClient<void>(`/notes/${id}`, {
       method: 'DELETE',
     });
   },
 
   async archiveNote(id: string): Promise<Note> {
-    return apiClient<Note>(`/notes/${id}/archive`, {
+    const response = await apiClient<{ data: Note }>(`/notes/${id}/archive`, {
       method: 'PATCH',
     });
+    return response.data;
   },
 
   async unarchiveNote(id: string): Promise<Note> {
-    return apiClient<Note>(`/notes/${id}/unarchive`, {
+    const response = await apiClient<{ data: Note }>(`/notes/${id}/unarchive`, {
       method: 'PATCH',
     });
+    return response.data;
   },
 };

@@ -7,6 +7,11 @@ interface LoginResponse {
   user: User;
 }
 
+interface RegisterResponse {
+  userConfirmed: boolean;
+  email: string;
+}
+
 interface RegisterData {
   name: string;
   email: string;
@@ -20,17 +25,19 @@ interface LoginData {
 
 export const authService = {
   async login(data: LoginData): Promise<LoginResponse> {
-    return apiClient<LoginResponse>('/auth/login', {
+    const response = await apiClient<{ data: LoginResponse }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return response.data;
   },
 
-  async register(data: RegisterData): Promise<LoginResponse> {
-    return apiClient<LoginResponse>('/auth/register', {
+  async register(data: RegisterData): Promise<RegisterResponse> {
+    const response = await apiClient<{ data: RegisterResponse }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return response.data;
   },
 
   async getProfile(): Promise<User> {

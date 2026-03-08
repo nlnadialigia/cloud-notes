@@ -6,6 +6,7 @@ import { CognitoService } from './cognito.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
 import { JwtAuthGuard } from './jwt-auth.guard'
+import { LoggerService } from '../../common/logger'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -13,29 +14,45 @@ export class AuthController {
   constructor(
     private cognitoService: CognitoService,
     private usersService: UsersService,
-  ) {}
+    private logger: LoggerService,
+  ) {
+    this.logger.setContext('AuthController')
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Register with AWS Cognito' })
   async register(@Body() dto: RegisterDto) {
-    const result = await this.cognitoService.signUp(dto.name, dto.email, dto.password)
-    
-    if (!result.UserSub) throw new Error('User registration failed')
-    
-    // Criar usuário no banco
-    const user = await this.usersService.findOrCreateUser(result.UserSub, dto.email, dto.name)
-    
-    return { 
-      success: true, 
-      message: 'User registered successfully', 
-      data: {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          createdAt: user.createdAt,
+    try {
+      this.logger.log(`Registering user: ${dto.email}`)
+      
+      const result = await this.cognitoService.signUp(dto.name, dto.email, dto.password)
+      
+      if (!result.UserSub) {
+        this.logger.error('User registration failed - no UserSub returned')
+        throw new Error('User registration failed')
+      }
+      
+      this.logger.log(`Cognito user created: ${result.UserSub}`)
+      
+      // Criar usuário no banco
+      const user = await this.usersService.findOrCreateUser(result.UserSub, dto.email, dto.name)
+      
+      // Se DB_TYPE=both, user é { sql, nosql }
+      const userData = (user as any).sql || user
+      
+      this.logger.log(`User created in database: ${userData.id}`)
+      
+      return { 
+        success: true, 
+        message: 'User registered successfully. Please check your email to confirm your account.',
+        data: {
+          userConfirmed: result.UserConfirmed || false,
+          email: dto.email,
         },
-      },
+      }
+    } catch (error) {
+      this.logger.error(`Registration error: ${error.message}`, error.stack)
+      throw error
     }
   }
 
@@ -52,6 +69,7 @@ export class AuthController {
 
     // Sincronizar usuário no banco
     const user = await this.usersService.findOrCreateUser(payload.sub, payload.email, payload.name)
+    const userData = (user as any).sql || user
 
     return {
       success: true,
@@ -59,10 +77,10 @@ export class AuthController {
         accessToken: idToken,
         refreshToken: result.AuthenticationResult?.RefreshToken,
         user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          createdAt: user.createdAt,
+          id: userData.id,
+          email: userData.email,
+          name: userData.name,
+          createdAt: userData.createdAt,
         },
       },
     }
@@ -85,6 +103,7 @@ export class AuthController {
 
     // Sincronizar usuário no banco
     const user = await this.usersService.findOrCreateUser(payload.sub, payload.email, payload.name)
+    const userData = (user as any).sql || user
 
     return {
       success: true,
@@ -92,10 +111,10 @@ export class AuthController {
         accessToken: idToken,
         refreshToken: tokens.refresh_token,
         user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          createdAt: user.createdAt,
+          id: userData.id,
+          email: userData.email,
+          name: userData.name,
+          createdAt: userData.createdAt,
         },
       },
     }

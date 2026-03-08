@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme-context'
 import { I18nProvider } from '@/lib/i18n-context'
+import { QueryProvider } from '@/lib/query-provider'
 import { Toaster } from '@/components/ui/toaster'
 
 const _geist = Geist({ subsets: ['latin'] })
@@ -34,12 +35,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <ThemeProvider>
-          <I18nProvider>
-            {children}
-            <Toaster />
-          </I18nProvider>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <I18nProvider>
+              {children}
+              <Toaster />
+            </I18nProvider>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   )
