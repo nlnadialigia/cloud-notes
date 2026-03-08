@@ -42,6 +42,7 @@ A aplicação será um **Gerenciador de Tarefas (Task Manager)**.
 
 ## Infraestrutura AWS
 
+- AWS Cognito (Autenticação)
 - AWS RDS (PostgreSQL)
 - AWS DynamoDB
 - AWS S3
@@ -448,7 +449,63 @@ Boas práticas aplicadas:
 
 ---
 
-# 17. Objetivos de Aprendizado
+# 18. Configuração para Desenvolvimento
+
+## Variáveis de Ambiente
+
+### Backend (`apps/api/.env`)
+
+Variáveis importantes para desenvolvimento:
+
+```env
+# Auto-confirmar usuários (bypass da confirmação por email)
+AUTO_CONFIRM_USER=true
+
+# Tipo de banco: sql | nosql | both
+DB_TYPE=both
+```
+
+**AUTO_CONFIRM_USER**:
+- `true` (desenvolvimento): Usuários são auto-confirmados após registro, sem necessidade de verificação de email
+- `false` (produção): Usuários precisam confirmar email com código enviado pelo Cognito
+
+## Scripts de Gerenciamento do Cognito
+
+```bash
+cd apps/api
+
+# Listar todos os usuários e seus status
+pnpm cognito:list
+
+# Confirmar usuário manualmente
+pnpm cognito:confirm email@example.com
+
+# Deletar usuário específico
+pnpm cognito:delete email@example.com
+
+# Deletar todos os usuários
+pnpm cognito:delete-all
+```
+
+## Visualização dos Bancos de Dados
+
+**PostgreSQL (SQL):**
+```bash
+cd apps/api
+pnpm prisma:studio
+```
+Abre em: `http://localhost:5555`
+
+**DynamoDB (NoSQL):**
+```bash
+cd apps/api
+pnpm dynamo:admin
+```
+Abre em: `http://localhost:8001`
+
+---
+
+# 19. Objetivos de Aprendizado
 
 Com este projeto será possível aprender:
 

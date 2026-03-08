@@ -5,6 +5,7 @@ import {
   SignUpCommand,
   InitiateAuthCommand,
   AuthFlowType,
+  AdminConfirmSignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
 
 @Injectable()
@@ -48,6 +49,7 @@ export class CognitoService {
 
   async exchangeCodeForTokens(code: string) {
     const domain = this.configService.get('AWS_COGNITO_DOMAIN')
+    const region = this.configService.get('AWS_COGNITO_REGION', 'us-east-1')
     const redirectUri = `${this.configService.get('FRONTEND_URL', 'http://localhost:3000')}/auth/callback`
     
     const params = new URLSearchParams({
@@ -57,7 +59,9 @@ export class CognitoService {
       redirect_uri: redirectUri,
     })
 
-    const response = await fetch(`https://${domain}/oauth2/token`, {
+    const url = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -66,9 +70,19 @@ export class CognitoService {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to exchange code for tokens')
+      const error = await response.text()
+      throw new Error(`Failed to exchange code for tokens: ${error}`)
     }
 
     return response.json()
+  }
+
+  async adminConfirmUser(email: string) {
+    const command = new AdminConfirmSignUpCommand({
+      UserPoolId: this.configService.get('AWS_COGNITO_USER_POOL_ID'),
+      Username: email,
+    })
+
+    return this.client.send(command)
   }
 }

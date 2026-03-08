@@ -42,6 +42,7 @@ The application will be a **Task Manager**.
 
 ## AWS Infrastructure
 
+- AWS Cognito (Authentication)
 - AWS RDS (PostgreSQL)
 - AWS DynamoDB
 - AWS S3
@@ -449,7 +450,63 @@ Best practices applied:
 
 ---
 
-# 17. Learning Objectives
+# 18. Development Setup
+
+## Environment Variables
+
+### Backend (`apps/api/.env`)
+
+Key variables for development:
+
+```env
+# Auto-confirm users (bypass email confirmation)
+AUTO_CONFIRM_USER=true
+
+# Database type: sql | nosql | both
+DB_TYPE=both
+```
+
+**AUTO_CONFIRM_USER**:
+- `true` (development): Users are auto-confirmed after registration, no email verification needed
+- `false` (production): Users must confirm email with code sent by Cognito
+
+## Cognito Management Scripts
+
+```bash
+cd apps/api
+
+# List all users and their status
+pnpm cognito:list
+
+# Manually confirm a user
+pnpm cognito:confirm email@example.com
+
+# Delete a specific user
+pnpm cognito:delete email@example.com
+
+# Delete all users
+pnpm cognito:delete-all
+```
+
+## Database Visualization
+
+**PostgreSQL (SQL):**
+```bash
+cd apps/api
+pnpm prisma:studio
+```
+Opens at: `http://localhost:5555`
+
+**DynamoDB (NoSQL):**
+```bash
+cd apps/api
+pnpm dynamo:admin
+```
+Opens at: `http://localhost:8001`
+
+---
+
+# 19. Learning Objectives
 
 With this project it will be possible to learn:
 

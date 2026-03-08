@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
 import { UsersService } from '../users/users.service'
@@ -15,6 +16,7 @@ export class AuthController {
     private cognitoService: CognitoService,
     private usersService: UsersService,
     private logger: LoggerService,
+    private configService: ConfigService,
   ) {
     this.logger.setContext('AuthController')
   }
@@ -34,6 +36,14 @@ export class AuthController {
       
       this.logger.log(`Cognito user created: ${result.UserSub}`)
       
+      // Auto-confirmar em desenvolvimento
+      const autoConfirm = this.configService.get('AUTO_CONFIRM_USER', 'false') === 'true'
+      if (autoConfirm) {
+        this.logger.log(`Auto-confirming user: ${dto.email}`)
+        await this.cognitoService.adminConfirmUser(dto.email)
+        this.logger.log(`User auto-confirmed: ${dto.email}`)
+      }
+      
       // Criar usuário no banco
       const user = await this.usersService.findOrCreateUser(result.UserSub, dto.email, dto.name)
       
@@ -44,9 +54,11 @@ export class AuthController {
       
       return { 
         success: true, 
-        message: 'User registered successfully. Please check your email to confirm your account.',
+        message: autoConfirm 
+          ? 'User registered and confirmed successfully' 
+          : 'User registered successfully. Please check your email to confirm your account.',
         data: {
-          userConfirmed: result.UserConfirmed || false,
+          userConfirmed: autoConfirm || result.UserConfirmed || false,
           email: dto.email,
         },
       }
@@ -123,20 +135,11 @@ export class AuthController {
   @Get('google')
   @ApiOperation({ summary: 'Login with Google via Cognito' })
   googleLogin(@Res() res: Response) {
-    const domain = process.env.AWS_COGNITO_DOMAIN
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID
-    const redirectUri = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback`
-    const url = `https://${domain}.auth.us-east-1.amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=${redirectUri}&response_type=code&client_id=${clientId}&scope=email openid profile`
-    res.redirect(url)
-  }
-
-  @Get('github')
-  @ApiOperation({ summary: 'Login with GitHub via Cognito' })
-  githubLogin(@Res() res: Response) {
-    const domain = process.env.AWS_COGNITO_DOMAIN
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID
-    const redirectUri = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback`
-    const url = `https://${domain}.auth.us-east-1.amazoncognito.com/oauth2/authorize?identity_provider=GitHub&redirect_uri=${redirectUri}&response_type=code&client_id=${clientId}&scope=email openid profile`
+    const domain = this.configService.get('AWS_COGNITO_DOMAIN')
+    const region = this.configService.get('AWS_COGNITO_REGION', 'us-east-1')
+    const clientId = this.configService.get('AWS_COGNITO_CLIENT_ID')
+    const redirectUri = `${this.configService.get('FRONTEND_URL', 'http://localhost:3000')}/auth/callback`
+    const url = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=${redirectUri}&response_type=code&client_id=${clientId}&scope=email openid profile`
     res.redirect(url)
   }
 
