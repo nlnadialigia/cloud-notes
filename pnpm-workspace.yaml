@@ -5,6 +5,7 @@ packages:
 onlyBuiltDependencies:
   - '@nestjs/core'
   - '@prisma/engines'
+  - '@scarf/scarf'
   - msw
   - prisma
   - sharp
