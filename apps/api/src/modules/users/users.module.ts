@@ -6,6 +6,7 @@ import { UsersService } from './users.service'
 import { UsersController } from './users.controller'
 import { PrismaModule } from '../../prisma/prisma.module'
 import { DynamoModule } from '../../dynamo/dynamo.module'
+import { CognitoService } from '../auth/cognito.service'
 
 @Global()
 @Module({
@@ -17,7 +18,7 @@ import { DynamoModule } from '../../dynamo/dynamo.module'
     DynamoModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersSqlRepository, UsersNoSqlRepository],
+  providers: [UsersService, UsersSqlRepository, UsersNoSqlRepository, CognitoService],
   exports: [UsersService],
 })
 export class UsersModule {}

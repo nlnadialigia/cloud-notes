@@ -2,10 +2,13 @@ import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
-import { HttpExceptionFilter } from './common/filters/http-exception.filter'
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter'
+import { LoggerService } from './common/logger'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  const logger = app.get(LoggerService)
 
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -20,7 +23,7 @@ async function bootstrap() {
     }),
   )
 
-  app.useGlobalFilters(new HttpExceptionFilter())
+  app.useGlobalFilters(new AllExceptionsFilter(logger))
 
   const config = new DocumentBuilder()
     .setTitle('CloudNotes API')
@@ -35,8 +38,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
 
-  await app.listen(process.env.PORT ?? 5001)
-  console.log(`🚀 API rodando em http://localhost:${process.env.PORT ?? 5001}`)
-  console.log(`📚 Swagger disponível em http://localhost:${process.env.PORT ?? 5001}/api`)
+  const port = process.env.PORT ?? 5001
+  await app.listen(port)
+  
+  console.log(`🚀 API rodando em http://localhost:${port}`)
+  console.log(`📚 Swagger disponível em http://localhost:${port}/api`)
 }
 bootstrap()

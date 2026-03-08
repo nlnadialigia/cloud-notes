@@ -1,13 +1,13 @@
 'use client'
 
+import { Header } from '@/components/dashboard/header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Cloud, Database, Shield, Zap } from 'lucide-react'
-import Link from 'next/link'
-import { Header } from '@/components/dashboard/header'
 import { useI18n } from '@/lib/i18n-context'
 import { useTheme } from '@/lib/theme-context'
+import { ArrowRight, Cloud, Database, Shield, Zap } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function HomePage() {
   const { t } = useI18n()
@@ -50,7 +50,7 @@ export default function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/nlnadialigia/cloud-notes" target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="outline" className="gap-2">
                 <Image
                   src={resolvedTheme === 'dark' ? '/github-white.svg' : '/github-black.svg'}

@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
   InitiateAuthCommand,
   AuthFlowType,
+  AdminConfirmSignUpCommand,
+  AdminDeleteUserCommand,
+  ChangePasswordCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
 
 @Injectable()
@@ -11,11 +15,11 @@ export class CognitoService {
   private client: CognitoIdentityProviderClient
   private clientId: string
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.client = new CognitoIdentityProviderClient({
-      region: process.env.AWS_COGNITO_REGION || 'us-east-1',
+      region: this.configService.get('AWS_COGNITO_REGION', 'us-east-1'),
     })
-    this.clientId = process.env.AWS_COGNITO_CLIENT_ID || ''
+    this.clientId = this.configService.get('AWS_COGNITO_CLIENT_ID', '')
   }
 
   async signUp(name: string, email: string, password: string) {
@@ -40,6 +44,64 @@ export class CognitoService {
         USERNAME: email,
         PASSWORD: password,
       },
+    })
+
+    return this.client.send(command)
+  }
+
+  async exchangeCodeForTokens(code: string) {
+    const domain = this.configService.get('AWS_COGNITO_DOMAIN')
+    const region = this.configService.get('AWS_COGNITO_REGION', 'us-east-1')
+    const redirectUri = `${this.configService.get('FRONTEND_URL', 'http://localhost:3000')}/auth/callback`
+    
+    const params = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: this.clientId,
+      code,
+      redirect_uri: redirectUri,
+    })
+
+    const url = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Failed to exchange code for tokens: ${error}`)
+    }
+
+    return response.json()
+  }
+
+  async adminConfirmUser(email: string) {
+    const command = new AdminConfirmSignUpCommand({
+      UserPoolId: this.configService.get('AWS_COGNITO_USER_POOL_ID'),
+      Username: email,
+    })
+
+    return this.client.send(command)
+  }
+
+  async deleteUser(email: string) {
+    const command = new AdminDeleteUserCommand({
+      UserPoolId: this.configService.get('AWS_COGNITO_USER_POOL_ID'),
+      Username: email,
+    })
+
+    return this.client.send(command)
+  }
+
+  async changePassword(accessToken: string, oldPassword: string, newPassword: string) {
+    const command = new ChangePasswordCommand({
+      AccessToken: accessToken,
+      PreviousPassword: oldPassword,
+      ProposedPassword: newPassword,
     })
 
     return this.client.send(command)

@@ -49,7 +49,7 @@ export function NoteCard({ note, onEdit, onDelete, onArchive, onUnarchive }: Not
     <Card
       className={cn(
         'group bg-card hover:border-primary/50 transition-all duration-200 cursor-pointer',
-        note.archived && 'opacity-60',
+        note.status === 'archived' && 'opacity-60',
       )}
       onClick={() => onEdit(note)}
     >
@@ -76,7 +76,7 @@ export function NoteCard({ note, onEdit, onDelete, onArchive, onUnarchive }: Not
                 <Pencil className="h-4 w-4 mr-2" />
                 {t('edit')}
               </DropdownMenuItem>
-              {note.archived ? (
+              {note.status === 'archived' ? (
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
@@ -118,7 +118,7 @@ export function NoteCard({ note, onEdit, onDelete, onArchive, onUnarchive }: Not
         </p>
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">{formatDate(note.updatedAt)}</span>
-          {note.archived && (
+          {note.status === 'archived' && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
               {t('archivedNotes')}
             </span>

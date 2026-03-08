@@ -15,9 +15,10 @@
     "prisma-migrate": "pnpm --filter api prisma:migrate",
     "prisma-studio": "pnpm --filter api prisma:studio",
     "dynamo-init": "pnpm --filter api dynamo:init",
+    "dynamo-admin": "pnpm --filter api dynamo:admin",
     "t-init": "cd infra/terraform && terraform init",
-    "t-plan": "cd infra/terraform && terraform plan",
-    "t-apply": "cd infra/terraform && terraform apply",
+    "t-plan": "cd infra/terraform && terraform plan -out=tfplan",
+    "t-apply": "cd infra/terraform && terraform apply tfplan",
     "t-destroy": "cd infra/terraform && terraform destroy",
     "t-output": "cd infra/terraform && terraform output -json"
   },

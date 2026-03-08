@@ -73,7 +73,6 @@ resource "aws_cognito_user_pool_client" "main" {
   supported_identity_providers = [
     "COGNITO",
     aws_cognito_identity_provider.google.provider_name,
-    aws_cognito_identity_provider.github.provider_name
   ]
 
   prevent_user_existence_errors = "ENABLED"
@@ -99,31 +98,6 @@ resource "aws_cognito_identity_provider" "google" {
     authorize_scopes = "email profile openid"
     client_id        = var.google_client_id
     client_secret    = var.google_client_secret
-  }
-
-  attribute_mapping = {
-    email    = "email"
-    name     = "name"
-    username = "sub"
-  }
-}
-
-# GitHub Identity Provider
-resource "aws_cognito_identity_provider" "github" {
-  user_pool_id  = aws_cognito_user_pool.main.id
-  provider_name = "GitHub"
-  provider_type = "OIDC"
-
-  provider_details = {
-    authorize_scopes          = "openid user:email read:user"
-    client_id                 = var.github_client_id
-    client_secret             = var.github_client_secret
-    attributes_request_method = "GET"
-    oidc_issuer               = "https://token.actions.githubusercontent.com"
-    authorize_url             = "https://github.com/login/oauth/authorize"
-    token_url                 = "https://github.com/login/oauth/access_token"
-    attributes_url            = "https://api.github.com/user"
-    jwks_uri                  = "https://token.actions.githubusercontent.com/.well-known/jwks"
   }
 
   attribute_mapping = {

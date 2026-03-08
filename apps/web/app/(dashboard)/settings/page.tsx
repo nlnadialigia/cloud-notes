@@ -85,8 +85,8 @@ export default function SettingsPage() {
                 <span className="text-lg font-semibold text-primary">{user?.email?.charAt(0).toUpperCase()}</span>
               </div>
               <div>
-                <p className="font-medium text-foreground">{user?.email}</p>
-                <p className="text-sm text-muted-foreground">{t('activeAccount')}</p>
+                <p className="font-medium text-foreground">{user?.name}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
             </div>
           </CardContent>
