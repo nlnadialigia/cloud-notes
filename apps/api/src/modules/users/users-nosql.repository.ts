@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { DynamoService } from '../../dynamo/dynamo.service'
-import { GetCommand, PutCommand, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb'
+import { GetCommand, PutCommand, UpdateCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb'
 
 @Injectable()
 export class UsersNoSqlRepository {
@@ -86,5 +86,14 @@ export class UsersNoSqlRepository {
     )
 
     return result.Attributes
+  }
+
+  async delete(cognitoId: string) {
+    await this.dynamo.docClient.send(
+      new DeleteCommand({
+        TableName: process.env.DYNAMODB_TABLE_USERS || 'users',
+        Key: { cognitoId },
+      }),
+    )
   }
 }

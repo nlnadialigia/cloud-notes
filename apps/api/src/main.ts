@@ -28,8 +28,8 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .addTag('Auth', 'Autenticação via AWS Cognito')
-    .addTag('Users', 'Gerenciamento de usuários')
     .addTag('Notes', 'Gerenciamento de notas')
+    .addTag('Users', 'Gerenciamento de perfil do usuário')
     .build()
 
   const document = SwaggerModule.createDocument(app, config)

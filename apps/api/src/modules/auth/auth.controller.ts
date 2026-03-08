@@ -7,7 +7,7 @@ import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
 import { JwtAuthGuard } from './jwt-auth.guard'
 
-@ApiTags('Authentication')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
