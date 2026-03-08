@@ -1,0 +1,24 @@
+# Terraform variables file
+# Copy this file to terraform.tfvars and fill with your values
+
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "dev"
+
+# Google OAuth (Get from: https://console.cloud.google.com/apis/credentials)
+google_client_id     = "your-google-client-id.apps.googleusercontent.com"
+google_client_secret = "your-google-client-secret"
+
+# GitHub OAuth (Get from: https://github.com/settings/developers)
+github_client_id     = "your-github-client-id"
+github_client_secret = "your-github-client-secret"
+
+# Callback URLs
+callback_urls = [
+  "http://localhost:5001/auth/cognito/callback",
+  "http://localhost:3000/auth/callback"
+]
+
+logout_urls = [
+  "http://localhost:3000"
+]
