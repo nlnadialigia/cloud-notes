@@ -9,7 +9,17 @@
     "api:dev": "pnpm --filter api dev",
     "web:dev": "pnpm --filter web dev",
     "check-types": "turbo run check-types",
-    "compose": "docker compose -f compose.dev.yml up -d"
+    "compose": "docker compose -f compose.dev.yml up -d",
+    "docker-start": "docker start cloud-notes cloud-notes-redis cloud-notes-dynamodb",
+    "prisma-generate": "pnpm --filter api prisma:generate",
+    "prisma-migrate": "pnpm --filter api prisma:migrate",
+    "prisma-studio": "pnpm --filter api prisma:studio",
+    "dynamo-init": "pnpm --filter api dynamo:init",
+    "t-init": "cd infra/terraform && terraform init",
+    "t-plan": "cd infra/terraform && terraform plan",
+    "t-apply": "cd infra/terraform && terraform apply",
+    "t-destroy": "cd infra/terraform && terraform destroy",
+    "t-output": "cd infra/terraform && terraform output -json"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -24,7 +34,7 @@
     "typescript": "5.9.2",
     "typescript-eslint": "^8.56.1"
   },
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.31.0",
   "engines": {
     "node": ">=18"
   }
