@@ -20,8 +20,8 @@ export function Sidebar({ onNewNote }: SidebarProps) {
   const { t } = useI18n()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const activeCount = notes.filter((n) => !n.archived).length
-  const archivedCount = notes.filter((n) => n.archived).length
+  const activeCount = notes.filter((n) => n.status === 'active').length
+  const archivedCount = notes.filter((n) => n.status === 'archived').length
 
   const navItems: { label: string; filter: NoteFilter; icon: typeof FileText; count: number }[] = [
     { label: t('allNotes'), filter: 'all', icon: FileText, count: notes.length },
@@ -80,7 +80,7 @@ export function Sidebar({ onNewNote }: SidebarProps) {
       </nav>
 
       <div className="py-3 border-t">
-        <p className="px-3 pb-3 text-xs text-muted-foreground">{t('activeAccount')}</p>
+        <p className="px-3 pb-3 text-xs text-muted-foreground truncate">{user?.name || user?.email || t('activeAccount')}</p>
         <div className="flex justify-between gap-1">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/profile" className="flex items-center gap-1">

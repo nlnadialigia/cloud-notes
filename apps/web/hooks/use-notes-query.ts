@@ -48,7 +48,7 @@ export function useArchiveNoteMutation() {
   return useMutation({
     mutationFn: (id: string) => notesService.archiveNote(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] })
+      queryClient.invalidateQueries({ queryKey: ['notes'], refetchType: 'all' })
     },
   })
 }
@@ -59,7 +59,7 @@ export function useUnarchiveNoteMutation() {
   return useMutation({
     mutationFn: (id: string) => notesService.unarchiveNote(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] })
+      queryClient.invalidateQueries({ queryKey: ['notes'], refetchType: 'all' })
     },
   })
 }

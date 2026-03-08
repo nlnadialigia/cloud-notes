@@ -43,8 +43,8 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
   const filteredNotes = notes
     .filter((note) => {
-      if (filter === 'archived') return note.archived
-      if (filter === 'active') return !note.archived
+      if (filter === 'archived') return note.status === 'archived'
+      if (filter === 'active') return note.status === 'active'
       return true
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

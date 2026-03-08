@@ -23,11 +23,20 @@ interface UpdateProfileData {
 
 export const userService = {
   async getMe(): Promise<User> {
-    return apiClient<User>('/users/me');
+    const response = await apiClient<{ data: User }>('/users/me');
+    return response.data;
   },
 
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    return apiClient<User>('/users/me', {
+    const response = await apiClient<{ data: User }>('/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  async updatePassword(data: { currentPassword: string; newPassword: string }): Promise<void> {
+    return apiClient<void>('/users/me/password', {
       method: 'PATCH',
       body: JSON.stringify(data),
     });

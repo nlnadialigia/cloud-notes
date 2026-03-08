@@ -41,7 +41,8 @@ export const authService = {
   },
 
   async getProfile(): Promise<User> {
-    return apiClient<User>('/auth/me');
+    const response = await apiClient<{ data: User }>('/users/me');
+    return response.data;
   },
 
   logout() {

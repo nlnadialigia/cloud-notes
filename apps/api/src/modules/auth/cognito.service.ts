@@ -6,6 +6,8 @@ import {
   InitiateAuthCommand,
   AuthFlowType,
   AdminConfirmSignUpCommand,
+  AdminDeleteUserCommand,
+  ChangePasswordCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
 
 @Injectable()
@@ -81,6 +83,25 @@ export class CognitoService {
     const command = new AdminConfirmSignUpCommand({
       UserPoolId: this.configService.get('AWS_COGNITO_USER_POOL_ID'),
       Username: email,
+    })
+
+    return this.client.send(command)
+  }
+
+  async deleteUser(email: string) {
+    const command = new AdminDeleteUserCommand({
+      UserPoolId: this.configService.get('AWS_COGNITO_USER_POOL_ID'),
+      Username: email,
+    })
+
+    return this.client.send(command)
+  }
+
+  async changePassword(accessToken: string, oldPassword: string, newPassword: string) {
+    const command = new ChangePasswordCommand({
+      AccessToken: accessToken,
+      PreviousPassword: oldPassword,
+      ProposedPassword: newPassword,
     })
 
     return this.client.send(command)
