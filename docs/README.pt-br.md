@@ -1,6 +1,11 @@
 # Arquitetura da Aplicação - AWS Study Project
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](../README.md)
+[![NestJS](https://img.shields.io/badge/NestJS-11.x-E0234E?logo=nestjs)](https://nestjs.com/)
+[![Next.js](https://img.shields.io/badge/Next-16.x-E0234E?logo=nextjs)](https://nextjs.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.x-2D3748?logo=prisma)](https://www.prisma.io/)
+[![Swagger](https://img.shields.io/badge/Swagger-API%20Docs-85EA2D?logo=swagger)](https://real-time-notification-system-nl.up.railway.app/api)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## 1. Objetivo do Projeto
 
@@ -466,6 +471,7 @@ DB_TYPE=both
 ```
 
 **AUTO_CONFIRM_USER**:
+
 - `true` (desenvolvimento): Usuários são auto-confirmados após registro, sem necessidade de verificação de email
 - `false` (produção): Usuários precisam confirmar email com código enviado pelo Cognito
 
@@ -490,17 +496,21 @@ pnpm cognito:delete-all
 ## Visualização dos Bancos de Dados
 
 **PostgreSQL (SQL):**
+
 ```bash
 cd apps/api
 pnpm prisma:studio
 ```
+
 Abre em: `http://localhost:5555`
 
 **DynamoDB (NoSQL):**
+
 ```bash
 cd apps/api
 pnpm dynamo:admin
 ```
+
 Abre em: `http://localhost:8001`
 
 ---
