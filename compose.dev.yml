@@ -1,19 +1,22 @@
 services:
   postgres:
+    container_name: cloud-notes
     image: postgres:18-alpine
     environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-      POSTGRES_DB: template_db
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+      POSTGRES_DB: cloud_notes_db
     ports:
-      - '5432:5432'
+      - '7432:5432'
 
   redis:
+    container_name: cloud-notes-redis
     image: redis:latest
     ports:
-      - '6379:6379'
+      - '7379:6379'
 
   dynamodb:
+    container_name: cloud-notes-dynamodb
     image: amazon/dynamodb-local
     ports:
-      - '8000:8000'
+      - '7000:8000'
