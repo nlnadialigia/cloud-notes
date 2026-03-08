@@ -7,7 +7,7 @@ import { setCookie, getCookie, deleteCookie } from './cookies'
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>
-  signUp: (credentials: SignUpCredentials) => Promise<void>
+  signUp: (credentials: SignUpCredentials) => Promise<{ userConfirmed: boolean; email: string }>
   confirmSignUp: (input: ConfirmSignUpInput) => Promise<void>
   logout: () => void
   resendConfirmationCode: (email: string) => Promise<void>

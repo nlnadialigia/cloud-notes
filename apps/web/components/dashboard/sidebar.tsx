@@ -79,22 +79,17 @@ export function Sidebar({ onNewNote }: SidebarProps) {
         </ul>
       </nav>
 
-      <div className="p-3 border-t">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.email}</p>
-            <p className="text-xs text-muted-foreground">{t('activeAccount')}</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="flex-1" asChild>
-            <Link href="/profile" className="flex items-center gap-2">
+      <div className="py-3 border-t">
+        <p className="px-3 pb-3 text-xs text-muted-foreground">{t('activeAccount')}</p>
+        <div className="flex justify-between gap-1">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/profile" className="flex items-center gap-1">
               <User className="h-4 w-4" />
               Perfil
             </Link>
           </Button>
-          <Button variant="ghost" size="sm" className="flex-1" asChild>
-            <Link href="/settings" className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/settings" className="flex items-center gap-1">
               <Settings className="h-4 w-4" />
               {t('settings')}
             </Link>
